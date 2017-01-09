@@ -1,0 +1,219 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
+<link rel="import" href="../bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="../bower_components/app-layout/app-header-layout/app-header-layout.html">
+<link rel="import" href="../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
+<link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../bower_components/app-route/app-location.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../bower_components/iron-selector/iron-selector.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="bento-data.html">
+<link rel="import" href="bento-table-selector.html">
+<link rel="import" href="bento-hotpot-menu.html">
+<link rel="import" href="my-icons.html">
+
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/neon-animation/animations/scale-up-animation.html">
+<link rel="import" href="../bower_components/neon-animation/animations/fade-out-animation.html">
+
+<dom-module id="my-app">
+  <template>
+    <style>
+      :host {
+        --app-primary-color: #45ada8;
+        --app-secondary-color: #547980;
+
+        display: block;
+      }
+
+      app-header {
+        color: #fff;
+        background-color: var(--app-primary-color);
+      }
+      app-header paper-icon-button {
+        --paper-icon-button-ink-color: white;
+      }
+
+      .drawer-list {
+        margin: 0 20px;
+      }
+
+      .drawer-list a {
+        display: block;
+        padding: 0 16px;
+        text-decoration: none;
+        color: var(--app-secondary-color);
+        line-height: 40px;
+      }
+
+      .drawer-list a.iron-selected {
+        color: black;
+        font-weight: bold;
+      }
+
+      #hotpotdialog {
+        width: 100vh;
+        height: 100vh;
+      }
+    </style>
+
+    <app-location route="{{route}}"></app-location>
+    <app-route
+        route="{{route}}"
+        pattern="/:page"
+        data="{{routeData}}"
+        tail="{{subroute}}"></app-route>
+
+    <bento-data tables="{{tables}}" ref="{{ref}}" pots="{{pots}}"></bento-data>
+
+    <app-drawer-layout fullbleed force-narrow>
+      <!-- Drawer content -->
+      <app-drawer id="drawer">
+        <app-toolbar>Menu</app-toolbar>
+        <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
+          <a name="view1" href="/view1">Call Server</a>
+          <!--<a name="view2" href="/view2">Server Check</a>-->
+          <!--<a name="view3" href="/view3">View Three</a>-->
+        </iron-selector>
+      </app-drawer>
+
+      <!-- Main content -->
+      <app-header-layout has-scrolling-region>
+
+        <app-header condenses reveals effects="waterfall">
+          <app-toolbar>
+            <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
+            <div main-title>Restaurant Title</div>
+            <bento-table-selector id="tableselector" counterIntervalID="{{counterid}}" tablename="{{tablename}}"></bento-table-selector>
+          </app-toolbar>
+        </app-header>
+
+        <iron-pages
+            id="pages"
+            selected="[[page]]"
+            attr-for-selected="name"
+            fallback-selection="view404"
+            role="main">
+          <my-view1 name="view1" tables="{{tables}}" tablename="{{tablename}}" ref="{{ref}}"></my-view1>
+          <my-view2 name="view2" tables="{{tables}}" ref="{{ref}}"></my-view2>
+          <my-view3 name="view3"></my-view3>
+          <my-view404 name="view404"></my-view404>
+        </iron-pages>
+      </app-header-layout>
+    </app-drawer-layout>
+
+    <paper-dialog id="dialog"
+                  entry-animation="scale-up-animation"
+                  exit-animation="fade-out-animation" modal>
+      <h2>Table Number</h2>
+      <paper-dropdown-menu on-iron-select="_tableSelected" label="Value">
+        <paper-menu class="dropdown-content">
+          <paper-item>A1</paper-item>
+          <paper-item>A2</paper-item>
+          <paper-item>A3</paper-item>
+          <paper-item>A4</paper-item>
+          <paper-item>A5</paper-item>
+          <paper-item>A6</paper-item>
+          <paper-item>A8</paper-item>
+          <paper-item>A9</paper-item>
+          <paper-item>A10</paper-item>
+          <paper-item>A11</paper-item>
+          <paper-item>A12</paper-item>
+          <paper-item>A13</paper-item>
+        </paper-menu>
+      </paper-dropdown-menu>
+      <div class="buttons">
+        <paper-button dialog-confirm autofocus>OK</paper-button>
+      </div>
+
+    </paper-dialog>
+
+    <paper-dialog id="hotpotdialog"
+                  entry-animation="scale-up-animation"
+                  exit-animation="fade-out-animation" modal>
+      <h2>HOT POT MENU</h2>
+      <bento-hotpot-menu pots="{{pots}}"></bento-hotpot-menu>
+      <div class="buttons">
+        <paper-button dialog-confirm autofocus>Send Hot Pot Request</paper-button>
+      </div>
+    </paper-dialog>
+
+  </template>
+
+  <script>
+    Polymer({
+      is: 'my-app',
+
+      properties: {
+        page: {
+          type: String,
+          reflectToAttribute: true,
+          observer: '_pageChanged',
+        },
+        tablename: String
+      },
+
+      listeners: {
+        'open-table-dialog': 'handleOpenDialog', 'hotpotdialog': 'handleHotPotDialog'
+      },
+
+      observers: [
+        '_routePageChanged(routeData.page)',
+      ],
+
+      handleOpenDialog: function () {
+        this.$.dialog.open();
+      },
+
+      handleHotPotDialog: function () {
+        this.$.hotpotdialog.open();
+      },
+
+      _routePageChanged: function(page) {
+        this.page = page || 'view1';
+
+        // hide table selector if view2 is selected
+        if (page == 'view2') {
+          this.$.tableselector.style.visibility = "hidden";
+        } else {
+          this.$.tableselector.style.visibility = "visible";
+        }
+
+        if (!this.$.drawer.persistent) {
+          this.$.drawer.close();
+        }
+      },
+
+      _pageChanged: function(page) {
+        // Load page import on demand. Show 404 page if fails
+        var resolvedPageUrl = this.resolveUrl('my-' + page + '.html');
+        this.importHref(resolvedPageUrl, null, this._showPage404, true);
+      },
+
+      _showPage404: function() {
+        this.page = 'view404';
+      },
+
+      _tableSelected: function (e) {
+        this.tablename = e.target.selectedItem.innerText;
+        console.log(this.tablename);
+      }
+    });
+  </script>
+</dom-module>

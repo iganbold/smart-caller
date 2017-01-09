@@ -1,0 +1,123 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="../bower_components/paper-badge/paper-badge.html">
+<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+
+<link rel="import" href="shared-styles.html">
+
+<dom-module id="my-view1">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: flex;
+        flex-direction: column;
+        /*align-items: center;*/
+        justify-content: center;
+        padding: 10px;
+        height: 80vh;
+      }
+
+      paper-fab.extrabig {
+        width: 200px;
+        height: 200px;
+        padding-top: 10px;
+      }
+
+      paper-button {
+        height: 100vh;
+        color: white;
+      }
+
+      paper-button.yellow {
+        background-color: #FFEB3B;
+        color: black;
+      }
+
+      paper-button.red {
+        background-color: #ff8a65;
+      }
+
+      paper-button.brown {
+        background-color: #795548;
+      }
+
+      paper-button.primary {
+        background-color: #9de0ad;
+        color: black;
+      }
+
+    </style>
+
+    <!--<paper-fab icon="maps:directions-run" on-tap="callServer" label="Call Server" title="heart" class="extrabig"></paper-fab>-->
+    <paper-button class="yellow" on-tap="callServer" raised><iron-icon icon="maps:directions-run"></iron-icon>Call Server</paper-button><br>
+    <paper-button class="primary" on-tap="checkout" raised><iron-icon icon="receipt"></iron-icon>Check-out</paper-button><br>
+    <!--<paper-button class="red" on-tap="hotpotmenu" raised><iron-icon icon="all-out"></iron-icon>Hot Pot</paper-button>-->
+    <paper-button class="red" on-tap="cancelCall" raised><iron-icon icon="clear"></iron-icon>Cancel</paper-button>
+
+    <paper-toast id="toast0"></paper-toast>
+
+  </template>
+
+  <script>
+    Polymer({
+      is: 'my-view1',
+
+      properties: {
+        tables: Array,
+        ref: Object,
+        key: String,
+        tablename: String
+      },
+      callServer: function () {
+        this.sendRequest("Calling")
+      },
+
+      checkout: function () {
+        this.sendRequest("Check-out")
+      },
+
+      hotpotmenu: function () {
+        this.fire('hotpotdialog');
+      },
+
+      cancelCall: function () {
+        this.ref.child(this.key).remove();
+      },
+
+      sendRequest: function (text) {
+        if(this.key == null) {
+          this.key = this.ref.push().key;
+        }
+
+        if(this.tablename != null) {
+          this.ref.child(this.key).set({'name': 'Table '+this.tablename, 'desc': text, 'time': (new Date()).getTime()},this.onComplete);
+          this.$.toast0.text = "Server will be here SOON";
+        } else {
+          this.$.toast0.text = "Please choose the table number";
+        }
+
+        this.$.toast0.open();
+      },
+
+      onComplete: function(error) {
+        if (error) {
+          console.log('Operation failed');
+        } else {
+//          console.log('Operation completed');
+        }
+      }
+    });
+  </script>
+</dom-module>

@@ -1,0 +1,99 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-item/paper-icon-item.html">
+<link rel="import" href="../bower_components/iron-icons/maps-icons.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/paper-item/paper-item-body.html">
+<link rel="import" href="../bower_components/iron-list/iron-list.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="bento-time-counter.html">
+
+<link rel="import" href="shared-styles.html">
+
+<dom-module id="my-view2">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: block;
+
+        padding: 10px;
+      }
+
+      iron-list {
+        height: 100vh; /* don't use % values unless the parent element is sized. */
+      }
+
+      .server {
+        --iron-icon-fill-color: #594f4f;
+      }
+
+      paper-button.green {
+        background-color: #8bc34a;
+        color: white;
+      }
+
+    </style>
+
+    <div class="card">
+      <div role="listbox">
+        <template id="tableList" is="dom-repeat" items="{{tables}}" as="table">
+          <paper-icon-item>
+            <iron-icon class="server" icon="maps:directions-run" item-icon>
+            </iron-icon>
+            <paper-item-body two-line>
+              <div>{{table.name}}</div>
+              <div secondary>{{table.desc}}</div>
+            </paper-item-body>
+
+            <bento-time-counter time="{{table.time}}"></bento-time-counter>
+            <paper-button class="green" table="[[table]]" on-tap="clear" raised><iron-icon icon="check"></iron-icon>Accept Request</paper-button>
+          </paper-icon-item>
+        </template>
+      </div>
+    </div>
+
+    <audio id="sound" src="https://www.soundjay.com/drinks/sounds/glass-clink-1.mp3" autostart="false" ></audio>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'my-view2',
+      properties: {
+        tables: Array,
+        ref: Object
+      },
+      ready: function(){
+        var thisRoot = this;
+        thisRoot.$.sound.muted = true;
+
+        this.$.tableList.addEventListener("dom-change", function(event){
+          // If audio is muted make it unmuted
+          if(thisRoot.$.sound.muted) {
+            thisRoot.$.sound.muted = false;
+          } else {
+            thisRoot.$.sound.play();
+          }
+        });
+      },
+      clear: function(e) {
+        // mute the audio for clearing
+        this.$.sound.muted = true;
+        var key = e.currentTarget.table.$key;
+        this.ref.child(key).remove();
+//        this.$.query.ref.child(key).update({'calling': false});
+      }
+    });
+  </script>
+</dom-module>
