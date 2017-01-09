@@ -1,0 +1,70 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-app.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-query.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-document.html">
+<link rel="import" href="shared-styles.html">
+
+<dom-module id="bento-data">
+  <template>
+
+    <firebase-app name="bento"
+                  auth-domain="bento-aae5c.firebaseapp.com"
+                  database-url="https://bento-aae5c.firebaseio.com"
+                  api-key="AIzaSyCpP4vXwPwUbxdNlsAn0R-xESyyyv9zDOA">
+    </firebase-app>
+
+    <firebase-query
+            id="query"
+            app-name="bento"
+            path="/tables"
+            data="{{tables}}">
+    </firebase-query>
+
+    <firebase-query
+            id="hotpotquery"
+            app-name="bento"
+            path="/hotpot"
+            data="{{pots}}">
+    </firebase-query>
+
+  </template>
+
+  <script>
+    Polymer({
+      is: 'bento-data',
+      ready: function () {
+        this.ref = this.$.query.ref;
+      },
+
+      properties: {
+        tables: {
+          type: Object,
+          notify: true,
+          observer: 'dataChanged'
+        },
+        ref: {
+          type: Object,
+          notify: true
+        },
+        pots: {
+          type: Object,
+          notify: true
+        }
+      },
+
+      dataChanged: function (newData, oldData) {
+        // do something when the query returns values
+      }
+    });
+  </script>
+</dom-module>
